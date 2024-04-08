@@ -47,12 +47,7 @@ cov = [
   "test-cov",
   "cov-report",
 ]
-lint = "pylint {args:src/arxiv_client tests}"
 typecheck = "mypy --install-types --non-interactive {args:src/arxiv_client tests}"
-check = [
-  "lint",
-  "typecheck",
-]
 
 [[tool.hatch.envs.all.matrix]]
 python = ["3.10", "3.11", "3.12"]
@@ -95,4 +90,6 @@ exclude_lines = [
 ]
 
 [tool.ruff]
+force-exclude = true
 extend-exclude = ["src/arxiv_client/__init__.py"]
+line-length = 120
