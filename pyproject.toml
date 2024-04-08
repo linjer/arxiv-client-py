@@ -10,9 +10,7 @@ readme = "README.md"
 requires-python = ">=3.10"
 license = "MIT"
 keywords = []
-authors = [
-  { name = "Jerry Lin" },
-]
+authors = [{ name = "Jerry Lin" }]
 classifiers = [
   "Development Status :: 4 - Beta",
   "Programming Language :: Python :: 3.10",
@@ -91,5 +89,5 @@ exclude_lines = [
 
 [tool.ruff]
 force-exclude = true
-extend-exclude = ["src/arxiv_client/__init__.py"]
 line-length = 120
+extend-exclude = ["src/arxiv_client/__init__.py"]

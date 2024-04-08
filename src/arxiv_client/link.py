@@ -1,7 +1,5 @@
-from __future__ import annotations
-
 from dataclasses import dataclass
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Self
 
 if TYPE_CHECKING:
     import feedparser
@@ -33,8 +31,8 @@ class Link:
     def __str__(self) -> str:
         return self.href
 
-    @staticmethod
-    def from_feed_link(link: feedparser.FeedParserDict) -> Link:
+    @classmethod
+    def from_feed_link(cls, link: feedparser.FeedParserDict) -> Self:
         """
         Create a Link object from a feedparser link entry
 
@@ -45,4 +43,4 @@ class Link:
         href = link["href"]
         rel = link.get("rel")
         mime_type = link.get("type")
-        return Link(title, href, rel, mime_type)
+        return cls(title, href, rel, mime_type)

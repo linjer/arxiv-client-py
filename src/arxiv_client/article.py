@@ -1,9 +1,7 @@
-from __future__ import annotations
-
 from dataclasses import dataclass, field
 from datetime import datetime
 from functools import cached_property
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Self
 
 from arxiv_client import Author, Category, Link
 
@@ -73,20 +71,22 @@ class Article:
 
     _id_prefix_length = len("http://arxiv.org/abs/")
 
-    def __init__(self,
-                 arxiv_id: str,
-                 title: str,
-                 categories: list[str],
-                 primary_category: Category | None,
-                 authors: list[Author],
-                 summary: str,
-                 comment: str | None,
-                 links: list[Link],
-                 journal_ref: str | None,
-                 doi: str | None,
-                 published: datetime,
-                 updated: datetime,
-                 _raw_entry: feedparser.FeedParserDict) -> None:
+    def __init__(
+        self,
+        arxiv_id: str,
+        title: str,
+        categories: list[str],
+        primary_category: Category | None,
+        authors: list[Author],
+        summary: str,
+        comment: str | None,
+        links: list[Link],
+        journal_ref: str | None,
+        doi: str | None,
+        published: datetime,
+        updated: datetime,
+        _raw_entry: feedparser.FeedParserDict,
+    ) -> None:
         self.arxiv_id = arxiv_id
         self.title = title
         self.categories = categories
@@ -144,21 +144,19 @@ class Article:
         """
         return self._raw_entry
 
-    @staticmethod
-    def from_feed_entry(entry: feedparser.FeedParserDict) -> Article:
+    @classmethod
+    def from_feed_entry(cls, entry: feedparser.FeedParserDict) -> Self:
         """
         Create an article from a feed entry
 
         :param entry: The feed entry
         :return: The article
         """
-        if not hasattr(entry, "id"):
-            raise RuntimeError("Missing field id from feed entry")
 
         # https://info.arxiv.org/help/api/user-manual.html#3321-title-id-published-and-updated
-        arxiv_id = entry.id[Article._id_prefix_length:]
+        arxiv_id = entry.id[Article._id_prefix_length :]
         title = entry.title if hasattr(entry, "title") else "0"
-        return Article(
+        return cls(
             arxiv_id=arxiv_id,
             title=title,
             categories=[tag["term"] for tag in entry.tags],

@@ -1,7 +1,5 @@
-from __future__ import annotations
-
 from dataclasses import dataclass
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Self
 
 if TYPE_CHECKING:
     import feedparser
@@ -29,8 +27,8 @@ class Author:
     def __str__(self) -> str:
         return self.name
 
-    @staticmethod
-    def from_feed_author(author: feedparser.FeedParserDict) -> Author:
+    @classmethod
+    def from_feed_author(cls, author: feedparser.FeedParserDict) -> Self:
         """
         Create an Author object from a feedparser author entry
 
@@ -39,4 +37,4 @@ class Author:
         """
         name = author.get("name")
         affiliation = author.get("arxiv_affiliation")
-        return Author(name, affiliation)
+        return cls(name, affiliation)

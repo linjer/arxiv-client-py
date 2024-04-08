@@ -12,6 +12,7 @@ class SortBy(Enum):
     See [the arXiv API User's Manual: sort order for return
     results](https://arxiv.org/help/api/user-manual#sort).
     """
+
     RELEVANCE = "relevance"
     LAST_UPDATED_DATE = "lastUpdatedDate"
     SUBMITTED_DATE = "submittedDate"
@@ -24,6 +25,7 @@ class SortOrder(Enum):
     See [the arXiv API User's Manual: sort order for return
     results](https://arxiv.org/help/api/user-manual#sort).
     """
+
     ASC = "ascending"
     DESC = "descending"
 
@@ -33,6 +35,7 @@ class SortCriterion:
     """
     Sort criterion for the query results
     """
+
     sort_by: SortBy
     """
     Sort by
@@ -41,6 +44,7 @@ class SortCriterion:
     """
     Sort order
     """
+
     def __init__(self, sort_by: SortBy = SortBy.LAST_UPDATED_DATE, sort_order: SortOrder = SortOrder.DESC) -> None:
         """
         :param sort_by: The criterion to sort by
@@ -56,6 +60,7 @@ class Field(Enum):
 
     See [Arxiv Query Construction](https://info.arxiv.org/help/api/user-manual.html#query_details)
     """
+
     TITLE = "ti"
     AUTHOR = "au"
     ABSTRACT = "abs"
@@ -78,6 +83,7 @@ class Query:
     See [Arxiv Query Interface](https://info.arxiv.org/help/api/user-manual.html#311-query-interface)
     [Arxiv Query Construction](https://info.arxiv.org/help/api/user-manual.html#query_details)
     """
+
     # TODO: Support for remaining searchable fields
     #   - abstract
     #   - comment
@@ -122,16 +128,18 @@ class Query:
     Requests with `max_results` set >30_000 will result in HTTP 400 error
     """
 
-    def __init__(self,
-                 keywords: list[str] | None = None,
-                 title_keywords: list[str] | None = None,
-                 author_names: list[str] | None = None,
-                 categories: list[Category] | None = None,
-                 article_ids: list[str] | None = None,
-                 custom_params: str | None = None,
-                 sort_criterion: SortCriterion | None = None,
-                 start: int = 0,
-                 max_results: int | None = 10) -> None:
+    def __init__(
+        self,
+        keywords: list[str] | None = None,
+        title_keywords: list[str] | None = None,
+        author_names: list[str] | None = None,
+        categories: list[Category] | None = None,
+        article_ids: list[str] | None = None,
+        custom_params: str | None = None,
+        sort_criterion: SortCriterion | None = None,
+        start: int = 0,
+        max_results: int | None = 10,
+    ) -> None:
         """
         :param keywords: Keywords to search across all fields
         :param title_keywords: Title keywords to filter on
@@ -163,13 +171,22 @@ class Query:
         See [Arxiv Query Construction](https://info.arxiv.org/help/api/user-manual.html#query_details)
         :return: The URL parameters
         """
-        keywords = " OR ".join(f"{Field.ALL.value}:\"{keyword}\"" for keyword in self.keywords) if self.keywords else ""
-        title_keywords = " OR ".join(f"{Field.TITLE.value}:\"{keyword}\"" for keyword in self.title_keywords) \
-            if self.title_keywords else ""
-        authors = " OR ".join([f"{Field.AUTHOR.value}:\"{author}\"" for author in self.author_names]) \
-            if self.author_names else ""
-        categories = " OR ".join([f"{Field.CATEGORY.value}:{category.value}" for category in self.categories]) \
-            if self.categories else ""
+        keywords = " OR ".join(f'{Field.ALL.value}:"{keyword}"' for keyword in self.keywords) if self.keywords else ""
+        title_keywords = (
+            " OR ".join(f'{Field.TITLE.value}:"{keyword}"' for keyword in self.title_keywords)
+            if self.title_keywords
+            else ""
+        )
+        authors = (
+            " OR ".join([f'{Field.AUTHOR.value}:"{author}"' for author in self.author_names])
+            if self.author_names
+            else ""
+        )
+        categories = (
+            " OR ".join([f"{Field.CATEGORY.value}:{category.value}" for category in self.categories])
+            if self.categories
+            else ""
+        )
 
         partials: list[str] = []
         if keywords:
@@ -186,8 +203,11 @@ class Query:
         return {
             "search_query": " AND ".join(partials),
             "id_list": ",".join(self.article_ids),
-            **({"sortBy": self.sort_criterion.sort_by.value, "sortOrder": self.sort_criterion.sort_order.value}
-               if self.sort_criterion is not None else {}),
+            **(
+                {"sortBy": self.sort_criterion.sort_by.value, "sortOrder": self.sort_criterion.sort_order.value}
+                if self.sort_criterion is not None
+                else {}
+            ),
             **({"max_results": self.max_results} if self.max_results is not None else {}),
-            **({"start": self.start} if self.start is not None else {})
+            **({"start": self.start} if self.start is not None else {}),
         }
