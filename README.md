@@ -1,22 +1,23 @@
 # arxiv-client
 
 Python3 client for the [arXiv API](https://info.arxiv.org/help/api/user-manual.html).
+Install package from [PyPI](https://pypi.org/project/arxiv-client/): `arxiv_client`.
 
 This differs from the pre-existing [arxiv.py](https://github.com/lukasschwab/arxiv.py) project 
-in that it further abstracts away the arXiv API so you do not need to learn to build query 
-strings on your own.
+in that it further abstracts away the arXiv API so you do not need to learn to construct
+query strings. The overall goal is to enable users to skip reading the API docs entirely.
 
-The overall goal is to enable most users to query arXiv immediately, without needing to 
-reference the API docs.
+`arxiv.py` is currently:
 
-`arxiv.py` is currently more stable and is backwards compatible with older versions of Python.
-It is also currently recommended for queries that return large numbers of results.
+- More stable
+- Compatible with Python < 3.10
+- Performant for large queries
 
 ## Basic Features
 
 - Simple query building
 - Comprehensive entity models, with documentation
-  - For example, see the [Category](./arxiv_client/category.py) enum for arXiv's subject taxonomy
+  - For example, see the [Category](src/arxiv_client/category.py) enum for arXiv's subject taxonomy
 - Fully type annotated
 
 ### Under Development
@@ -33,12 +34,11 @@ In a nutshell:
 from arxiv_client import Client, Query, Category
 import pprint
 
-
 categories = [Category.CS_AI, Category.CS_CL, Category.CS_IR]
 client = Client()
 articles = client.search(Query(keywords=["llm"], categories=categories, max_results=2))
 for article in articles:
-    pprint.pprint(article) # Formatted pretty print is supported
+  pprint.pprint(article)  # Formatted pretty print is supported
 ```
 
 ### Simple Query Logic
@@ -68,7 +68,7 @@ Results in the following query logic:
 (all:"llm") AND (cat:cs.AI OR cat:cs.IR)
 ```
 
-See the [Query](./arxiv_client/query.py) class for more information.
+See the [Query](src/arxiv_client/query.py) class for more information.
 
 ### Advanced Query Logic
 
@@ -103,24 +103,4 @@ Results in the following query logic:
 
 ### Getting Started
 
-This uses [poetry](https://python-poetry.org/) for dependency management.
-See the [poetry documentation](https://python-poetry.org/docs) for usage.
-
-In a nutshell:
-
-1. Install [poetry](https://python-poetry.org/)
-2. Install project dependencies
-   
-    ```shell
-    poetry install
-    ```
-3. Activate compatible virtual environment
-
-    ```shell
-    poetry shell
-    ```
-
-### Contributing
-
-A goal was to aid in learning modern Python practices. 
-PRs and comments for improving style or best practice are appreciated.
+This uses [hatch](https://hatch.pypa.io/latest/) for project management.

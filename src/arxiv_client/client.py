@@ -1,7 +1,7 @@
 import logging
 from typing import List
 
-import feedparser
+import feedparser  # type: ignore
 import requests
 
 from arxiv_client import Article, Query

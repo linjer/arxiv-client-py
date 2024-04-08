@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Optional
 
-import feedparser
+import feedparser  # type: ignore
 
 
 @dataclass(init=False, repr=True, eq=False)

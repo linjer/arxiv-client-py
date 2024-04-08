@@ -5,7 +5,7 @@ from datetime import datetime
 from functools import cached_property
 from typing import List, Optional
 
-import feedparser
+import feedparser  # type: ignore
 
 from arxiv_client import Author, Link, Category
 
