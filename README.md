@@ -37,8 +37,8 @@ import pprint
 categories = [Category.CS_AI, Category.CS_CL, Category.CS_IR]
 client = Client()
 articles = client.search(Query(keywords=["llm"], categories=categories, max_results=2))
-for articles in articles:
-    pprint.pprint(articles) # Formatted pretty print is supported
+for article in articles:
+    pprint.pprint(article) # Formatted pretty print is supported
 ```
 
 ### Simple Query Logic
