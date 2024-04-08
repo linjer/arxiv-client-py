@@ -1,18 +1,19 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Optional
+from typing import TYPE_CHECKING
 
-import feedparser  # type: ignore
+if TYPE_CHECKING:
+    import feedparser
 
 
-@dataclass(init=False, repr=True, eq=False)
-class Link(object):
+@dataclass(init=True, repr=True, eq=True)
+class Link:
     """
     Link to an article
     """
 
-    title: Optional[str]
+    title: str | None
     """
     The title of the link
     """
@@ -20,20 +21,14 @@ class Link(object):
     """
     The URL of the link
     """
-    rel: Optional[str]
+    rel: str | None
     """
     The relation of the link. Can be alternate or related
     """
-    type: Optional[str]
+    mime_type: str | None
     """
     MIME type of the entity being linked, e.g., text/html
     """
-
-    def __init__(self, title: Optional[str], href: str, rel: Optional[str], mime_type: Optional[str]) -> None:
-        self.title = title
-        self.href = href
-        self.rel = rel
-        self.type = mime_type
 
     def __str__(self) -> str:
         return self.href

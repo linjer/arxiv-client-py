@@ -3,15 +3,16 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from datetime import datetime
 from functools import cached_property
-from typing import List, Optional
+from typing import TYPE_CHECKING
 
-import feedparser  # type: ignore
+from arxiv_client import Author, Category, Link
 
-from arxiv_client import Author, Link, Category
+if TYPE_CHECKING:
+    import feedparser
 
 
 @dataclass(init=False, repr=True, eq=False)
-class Article(object):
+class Article:
     """
     Article from the Arxiv API
     """
@@ -25,15 +26,15 @@ class Article(object):
     """
     The title of the article
     """
-    categories: List[str]
+    categories: list[str]
     """
     The categories of the article. May include categories outside of the ArXiv taxonomy
     """
-    primary_category: Optional[Category]
+    primary_category: Category | None
     """
     The primary category of the article provided by arXiv
     """
-    authors: List[Author]
+    authors: list[Author]
     """
     The authors of the article
     """
@@ -41,19 +42,19 @@ class Article(object):
     """
     The abstract for the article
     """
-    comment: Optional[str]
+    comment: str | None
     """
     The author's comment if present
     """
-    links: List[Link]
+    links: list[Link]
     """
     Links to associated with the article. Up to 3 links are provided by arXiv: PDF, DOI, and arxiv abstract page
     """
-    journal_ref: Optional[str]
+    journal_ref: str | None
     """
     Author provided journal reference
     """
-    doi: Optional[str]
+    doi: str | None
     """
     Author provided DOI
     """
@@ -75,14 +76,14 @@ class Article(object):
     def __init__(self,
                  arxiv_id: str,
                  title: str,
-                 categories: List[str],
-                 primary_category: Optional[Category],
-                 authors: List[Author],
+                 categories: list[str],
+                 primary_category: Category | None,
+                 authors: list[Author],
                  summary: str,
-                 comment: Optional[str],
-                 links: List[Link],
-                 journal_ref: Optional[str],
-                 doi: Optional[str],
+                 comment: str | None,
+                 links: list[Link],
+                 journal_ref: str | None,
+                 doi: str | None,
                  published: datetime,
                  updated: datetime,
                  _raw_entry: feedparser.FeedParserDict) -> None:
@@ -102,16 +103,16 @@ class Article(object):
 
     def __str__(self) -> str:
         return repr(self)
-    
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Article):
             return False
-        # May fail in rare case where one but of the IDs (but not the other) 
+        # May fail in rare case where one but of the IDs (but not the other)
         # has had version number stripped
         return self.arxiv_id == other.arxiv_id and self.updated == other.updated
 
     @cached_property
-    def pdf_url(self) -> Optional[str]:
+    def pdf_url(self) -> str | None:
         """
         Get the URL to the PDF of the article. A PDF link should always be present
 
@@ -123,7 +124,7 @@ class Article(object):
         return None
 
     @cached_property
-    def doi_url(self) -> Optional[str]:
+    def doi_url(self) -> str | None:
         """
         Get the DOI URL for the article if it exists. May not be needed as the doi field may already contain the URL
 

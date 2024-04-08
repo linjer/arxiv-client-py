@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from enum import Enum
-from typing import List, Dict, Optional, Any
+from typing import Any
 
 from arxiv_client import Category
 
@@ -29,7 +29,7 @@ class SortOrder(Enum):
 
 
 @dataclass(init=False, repr=True)
-class SortCriterion(object):
+class SortCriterion:
     """
     Sort criterion for the query results
     """
@@ -41,7 +41,6 @@ class SortCriterion(object):
     """
     Sort order
     """
-
     def __init__(self, sort_by: SortBy = SortBy.LAST_UPDATED_DATE, sort_order: SortOrder = SortOrder.DESC) -> None:
         """
         :param sort_by: The criterion to sort by
@@ -69,7 +68,7 @@ class Field(Enum):
 
 
 @dataclass(init=False, repr=True, eq=False)
-class Query(object):
+class Query:
     """
     Typed wrapper for an Arxiv query. Multiples values within a single field are combined with `OR`,
     while multiple fields are combined with `AND`.
@@ -84,56 +83,55 @@ class Query(object):
     #   - comment
     #   - journal reference
     #   - report number
-    keywords: List[str]
+    keywords: list[str]
     """
     Keywords to search across all fields.
     """
-    title_keywords: List[str]
+    title_keywords: list[str]
     """
     Title keywords to filter on.
     """
-    author_names: List[str]
+    author_names: list[str]
     """
     Author names to filter on.
     """
-    categories: List[Category]
+    categories: list[Category]
     """
     Subject categories to filter on.
     """
-    article_ids: List[str]
+    article_ids: list[str]
     """
     ArXiv article IDs to filter on.
     """
-    custom_params: Optional[str]
+    custom_params: str | None
     """
     Query param string for advanced users. This is helpful if query logic is not supported, e.g.,
     searching by `AND` logic between keywords.
     """
-    sort_criterion: Optional[SortCriterion]
+    sort_criterion: SortCriterion | None
     """
-    SortBy and SortOrder for the query results. Default is to sort by LAST_UPDATED_DATE in DESC order
-    Pass `None` to use API default sort
+    SortBy and SortOrder for the query results. Default is to sort by LAST_UPDATED_DATE in DESC order.
     """
-    start: Optional[int]
+    start: int
     """
     Pagination parameter using zero-based indexing
     """
-    max_results: Optional[int]
+    max_results: int | None
     """
     The max number of results to get. Set to `None` to get maximum number of results allowed by the API.
     Requests with `max_results` set >30_000 will result in HTTP 400 error
     """
 
     def __init__(self,
-                 keywords: Optional[List[str]] = None,
-                 title_keywords: Optional[List[str]] = None,
-                 author_names: Optional[List[str]] = None,
-                 categories: Optional[List[Category]] = None,
-                 article_ids: Optional[List[str]] = None,
-                 custom_params: Optional[str] = None,
-                 sort_criterion: Optional[SortCriterion] = SortCriterion(),
-                 start: Optional[int] = None,
-                 max_results: Optional[int] = 10) -> None:
+                 keywords: list[str] | None = None,
+                 title_keywords: list[str] | None = None,
+                 author_names: list[str] | None = None,
+                 categories: list[Category] | None = None,
+                 article_ids: list[str] | None = None,
+                 custom_params: str | None = None,
+                 sort_criterion: SortCriterion | None = None,
+                 start: int = 0,
+                 max_results: int | None = 10) -> None:
         """
         :param keywords: Keywords to search across all fields
         :param title_keywords: Title keywords to filter on
@@ -151,14 +149,14 @@ class Query(object):
         self.categories = [] if categories is None else categories
         self.article_ids = [] if article_ids is None else article_ids
         self.custom_params = custom_params
-        self.sort_criterion = sort_criterion
+        self.sort_criterion = SortCriterion() if sort_criterion is None else sort_criterion
         self.start = start
         self.max_results = max_results
 
     def __str__(self) -> str:
         return repr(self)
 
-    def _to_url_params(self) -> Dict[str, Any]:
+    def _to_url_params(self) -> dict[str, Any]:
         """
         Construct the full query as a Dict of query parameters, not yet URL encoded.
 
@@ -173,7 +171,7 @@ class Query(object):
         categories = " OR ".join([f"{Field.CATEGORY.value}:{category.value}" for category in self.categories]) \
             if self.categories else ""
 
-        partials: List[str] = []
+        partials: list[str] = []
         if keywords:
             partials.append(f"({keywords})")
         if title_keywords:

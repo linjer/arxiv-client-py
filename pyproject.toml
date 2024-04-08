@@ -47,8 +47,12 @@ cov = [
   "test-cov",
   "cov-report",
 ]
-check = "mypy --install-types --non-interactive {args:src/arxiv_client tests}"
-clean = "rm -rf dist"
+lint = "pylint {args:src/arxiv_client tests}"
+typecheck = "mypy --install-types --non-interactive {args:src/arxiv_client tests}"
+check = [
+  "lint",
+  "typecheck",
+]
 
 [[tool.hatch.envs.all.matrix]]
 python = ["3.10", "3.11", "3.12"]
@@ -89,3 +93,6 @@ exclude_lines = [
   "if __name__ == .__main__.:",
   "if TYPE_CHECKING:",
 ]
+
+[tool.ruff]
+extend-exclude = ["src/arxiv_client/__init__.py"]

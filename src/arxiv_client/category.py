@@ -1,16 +1,14 @@
-from __future__ import annotations
-
 from enum import Enum
-from typing import Optional
+from typing import Self
 
 
 class Category(Enum):
     """
     All the categories in the arXiv subject taxonomy, mapped to their codes.
-    
+
     See [Arxiv category taxonomy](https://arxiv.org/category_taxonomy)
     """
-    def __new__(cls, value: object, description: Optional[str] = None) -> Category:
+    def __new__(cls, value: object, description: str | None = None) -> Self:
         """Allows for custom descriptions for each enum value"""
         obj = object.__new__(cls)
         obj._value_ = value

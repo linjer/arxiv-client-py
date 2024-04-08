@@ -1,13 +1,14 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Optional
+from typing import TYPE_CHECKING
 
-import feedparser  # type: ignore
+if TYPE_CHECKING:
+    import feedparser
 
 
 @dataclass(init=False, repr=True, eq=False)
-class Author(object):
+class Author:
     """
     Author of an article
     """
@@ -16,12 +17,12 @@ class Author(object):
     """
     Full name of the author
     """
-    affiliation: Optional[str]
+    affiliation: str | None
     """
     The affiliation of the author. This is rarely populated
     """
 
-    def __init__(self, name: str, affiliation: Optional[str] = None) -> None:
+    def __init__(self, name: str, affiliation: str | None = None) -> None:
         self.name = name
         self.affiliation = affiliation
 

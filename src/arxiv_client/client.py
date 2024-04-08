@@ -1,5 +1,4 @@
 import logging
-from typing import List
 
 import feedparser  # type: ignore
 import requests
@@ -9,7 +8,7 @@ from arxiv_client import Article, Query
 logger = logging.getLogger(__name__)
 
 
-class Client(object):
+class Client:
     """
     Python wrapper for the Arxiv API
     """
@@ -24,21 +23,21 @@ class Client(object):
     def __init__(self) -> None:
         self._session.headers.update({"User-Agent": "arxiv-client-py"})
 
-    # TODO:
+    # TODO: Consider support for the following
     #  1. Generator
     #  2. Advanced paging
     #  3. Consider async io
-    def search(self, query: Query) -> List[Article]:
+    def search(self, query: Query) -> list[Article]:
         """
         Search the Arxiv API
 
         :param query: The query to search with
         :return: The search results
         """
-        logger.debug(f"Searching arxiv with query: {query}")
-        response = self._session.get(self.base_search_url, params=query._to_url_params())
+        logger.debug("Searching arxiv with query: %r", query)
+        response = self._session.get(self.base_search_url, params=query._to_url_params())  # noqa: SLF001
         response.raise_for_status()
 
         feed = feedparser.parse(response.content)
-        logger.debug(f"ArXiv returned {len(feed.entries)} results")
+        logger.debug("ArXiv returned %d results", len(feed.entries))
         return [Article.from_feed_entry(entry) for entry in feed.entries]
