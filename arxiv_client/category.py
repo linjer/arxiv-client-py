@@ -62,7 +62,7 @@ class Category(Enum):
     ECON_GN = 'econ.GN', 'Economics - General Economics'
     ECON_TH = 'econ.TH', 'Economics - Theoretical Economics'
     # Electrical Engineering and Systems Science
-    EESS_ASD = 'eess.AS', 'Electrical Engineering and Systems Science - Audio and Speech Processing'
+    EESS_AS = 'eess.AS', 'Electrical Engineering and Systems Science - Audio and Speech Processing'
     EESS_IV = 'eess.IV', 'Electrical Engineering and Systems Science - Image and Video Processing'
     EESS_SP = 'eess.SP', 'Electrical Engineering and Systems Science - Signal Processing'
     EESS_SY = 'eess.SY', 'Electrical Engineering and Systems Science - Systems and Control'
@@ -100,12 +100,14 @@ class Category(Enum):
     MATH_SP = 'math.SP', 'Mathematics - Spectral Theory'
     MATH_ST = 'math.ST', 'Mathematics - Statistics Theory'
     # Physics
+    # - Astrophysics
     ASTRO_PH_CO = 'astro-ph.CO', 'Astrophysics - Cosmology and Nongalactic Astrophysics'
     ASTRO_PH_EP = 'astro-ph.EP', 'Astrophysics - Earth and Planetary Astrophysics'
     ASTRO_PH_GA = 'astro-ph.GA', 'Astrophysics - Astrophysics of Galaxies'
     ASTRO_PH_HE = 'astro-ph.HE', 'Astrophysics - High Energy Astrophysical Phenomena'
     ASTRO_PH_IM = 'astro-ph.IM', 'Astrophysics - Instrumentation and Methods for Astrophysics'
     ASTRO_PH_SR = 'astro-ph.SR', 'Astrophysics - Solar and Stellar Astrophysics'
+    # - Condensed Matter
     COND_MAT_DIS_NN = 'cond-mat.dis-nn', 'Condensed Matter - Disordered Systems and Neural Networks'
     COND_MAT_MES_HALL = 'cond-mat.mes-hall', 'Condensed Matter - Mesoscale and Nanoscale Physics'
     COND_MAT_MTRL_SCI = 'cond-mat.mtrl-sci', 'Condensed Matter - Materials Science'
@@ -114,19 +116,25 @@ class Category(Enum):
     COND_MAT_STAT_MECH = 'cond-mat.stat-mech', 'Condensed Matter - Statistical Mechanics'
     COND_MAT_STR_EL = 'cond-mat.str-el', 'Condensed Matter - Strongly Correlated Electrons'
     COND_MAT_SUPR_CON = 'cond-mat.supr-con', 'Condensed Matter - Superconductivity'
+    # - General Relativity
     GR_QC = 'gr-qc', 'General Relativity and Quantum Cosmology'
+    # - High Energy Physics
     HEP_EX = 'hep-ex', 'High Energy Physics - Experiment'
     HEP_LAT = 'hep-lat', 'High Energy Physics - Lattice'
     HEP_PH = 'hep-ph', 'High Energy Physics - Phenomenology'
     HEP_TH = 'hep-th', 'High Energy Physics - Theory'
+    # - Mathematical Physics
     MATH_PH = 'math-ph', 'Mathematical Physics'
+    # - Nonlinear Sciences
     NLIN_AO = 'nlin.AO', 'Nonlinear Sciences - Adaptation and Self-Organizing Systems'
     NLIN_CD = 'nlin.CD', 'Nonlinear Sciences - Chaotic Dynamics'
     NLIN_CG = 'nlin.CG', 'Nonlinear Sciences - Cellular Automata and Lattice Gases'
     NLIN_PS = 'nlin.PS', 'Nonlinear Sciences - Pattern Formation and Solitons'
     NLIN_SI = 'nlin.SI', 'Nonlinear Sciences - Exactly Solvable and Integrable Systems'
+    # - Nuclear Physics
     NUCL_EX = 'nucl-ex', 'Nuclear Experiment'
     NUCL_TH = 'nucl-th', 'Nuclear Theory'
+    # - General Physics
     PHYSICS_ACC_PH = 'physics.acc-ph', 'Physics - Accelerator Physics'
     PHYSICS_AO_PH = 'physics.ao-ph', 'Physics - Atmospheric and Oceanic Physics'
     PHYSICS_APP_PH = 'physics.app-ph', 'Physics - Applied Physics'
@@ -149,7 +157,33 @@ class Category(Enum):
     PHYSICS_POP_PH = 'physics.pop-ph', 'Physics - Popular Physics'
     PHYSICS_SOC_PH = 'physics.soc-ph', 'Physics - Physics and Society'
     PHYSICS_SPACE_PH = 'physics.space-ph', 'Physics - Space Physics'
+    # - Quantum Physics
     QUANT_PH = 'quant-ph', 'Quantum Physics'
-    # TODO: Quantitative Biology
-    # TODO: Quantitative Finance
-    # TODO: Statistics
+    # Quantitative Biology
+    Q_BIO_BM = 'q-bio.BM', 'Quantitative Biology - Biomolecules'
+    Q_BIO_CB = 'q-bio.CB', 'Quantitative Biology - Cell Behavior'
+    Q_BIO_GN = 'q-bio.GN', 'Quantitative Biology - Genomics'
+    Q_BIO_MN = 'q-bio.MN', 'Quantitative Biology - Molecular Networks'
+    Q_BIO_NC = 'q-bio.NC', 'Quantitative Biology - Neurons and Cognition'
+    Q_BIO_OT = 'q-bio.OT', 'Quantitative Biology - Other'
+    Q_BIO_PE = 'q-bio.PE', 'Quantitative Biology - Populations and Evolution'
+    Q_BIO_QM = 'q-bio.QM', 'Quantitative Biology - Quantitative Methods'
+    Q_BIO_SC = 'q-bio.SC', 'Quantitative Biology - Subcellular Processes'
+    Q_BIO_TO = 'q-bio.TO', 'Quantitative Biology - Tissues and Organs'
+    # Quantitative Finance
+    Q_FIN_CP = 'q-fin.CP', 'Quantitative Finance - Computational Finance'
+    Q_FIN_EC = 'q-fin.EC', 'Quantitative Finance - Economics'
+    Q_FIN_GN = 'q-fin.GN', 'Quantitative Finance - General Finance'
+    Q_FIN_MF = 'q-fin.MF', 'Quantitative Finance - Mathematical Finance'
+    Q_FIN_PM = 'q-fin.PM', 'Quantitative Finance - Portfolio Management'
+    Q_FIN_PR = 'q-fin.PR', 'Quantitative Finance - Pricing of Securities'
+    Q_FIN_RM = 'q-fin.RM', 'Quantitative Finance - Risk Management'
+    Q_FIN_ST = 'q-fin.ST', 'Quantitative Finance - Statistical Finance'
+    Q_FIN_TR = 'q-fin.TR', 'Quantitative Finance - Trading and Market Microstructure'
+    # Statistics
+    STAT_AP = 'stat.AP', 'Statistics - Applications'
+    STAT_CO = 'stat.CO', 'Statistics - Computation'
+    STAT_ME = 'stat.ME', 'Statistics - Methodology'
+    STAT_ML = 'stat.ML', 'Statistics - Machine Learning'
+    STAT_OT = 'stat.OT', 'Statistics - Other Statistics'
+    STAT_TH = 'stat.TH', 'Statistics - Statistics Theory'
