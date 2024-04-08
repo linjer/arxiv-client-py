@@ -7,7 +7,7 @@ name = "arxiv-client"
 dynamic = ["version"]
 description = 'Python3 client for the arXiv API'
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 license = "MIT"
 keywords = []
 authors = [{ name = "Jerry Lin" }]
@@ -48,7 +48,7 @@ cov = [
 typecheck = "mypy --install-types --non-interactive {args:src/arxiv_client tests}"
 
 [[tool.hatch.envs.all.matrix]]
-python = ["3.10", "3.11", "3.12"]
+python = ["3.11", "3.12"]
 
 [tool.hatch.version]
 path = "src/arxiv_client/__about__.py"
