@@ -1,12 +1,11 @@
 from dataclasses import dataclass, field
 from datetime import datetime
 from functools import cached_property
-from typing import TYPE_CHECKING, Self
+from typing import Self
+
+import feedparser  # type: ignore
 
 from arxiv_client import Author, Category, Link
-
-if TYPE_CHECKING:
-    import feedparser
 
 
 @dataclass(init=False, repr=True, eq=False)

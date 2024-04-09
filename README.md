@@ -10,7 +10,7 @@ query strings. The overall goal is to enable users to skip reading the API docs 
 `arxiv.py` is currently:
 
 - More stable
-- Compatible with Python < 3.10
+- Compatible with Python < 3.11
 - Performant for large queries
 
 ## Basic Features
@@ -31,19 +31,19 @@ query strings. The overall goal is to enable users to skip reading the API docs 
 In a nutshell:
 
 ```py
-from arxiv_client import Client, Query, Category
+import arxiv_client as arx
 import pprint
 
-categories = [Category.CS_AI, Category.CS_CL, Category.CS_IR]
-client = Client()
-articles = client.search(Query(keywords=["llm"], categories=categories, max_results=2))
+categories = [arx.Category.CS_AI, arx.Category.CS_CL, arx.Category.CS_IR]
+client = arx.Client()
+articles = client.search(arx.Query(keywords=["llm"], categories=categories, max_results=2))
 for article in articles:
   pprint.pprint(article)  # Formatted pretty print is supported
 ```
 
-### Simple Query Logic
+### Structured Query Logic
 
-When using the provided `Query` fields, multiple values within a single field are combined using `OR`, 
+When using the structured `Query` fields, multiple values within a single field are combined using `OR`, 
 and multiple fields are combined using `AND`.
 
 #### Example
@@ -70,7 +70,7 @@ Results in the following query logic:
 
 See the [Query](src/arxiv_client/query.py) class for more information.
 
-### Advanced Query Logic
+### Custom Queries
 
 If the provided simple query logic is insufficient, the `Query` object takes a self-built query string through the `custom_params` attribute. You do not need to URL encode this value.
 
@@ -100,7 +100,5 @@ Results in the following query logic:
 ```
 
 ## Development
-
-### Getting Started
 
 This uses [hatch](https://hatch.pypa.io/latest/) for project management.

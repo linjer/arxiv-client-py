@@ -1,8 +1,7 @@
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Self
+from typing import Self
 
-if TYPE_CHECKING:
-    import feedparser
+import feedparser  # type: ignore
 
 
 @dataclass(init=True, repr=True, eq=True)

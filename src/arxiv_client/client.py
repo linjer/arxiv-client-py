@@ -1,4 +1,5 @@
 import logging
+from collections.abc import Iterator
 
 import feedparser  # type: ignore
 import requests
@@ -24,10 +25,9 @@ class Client:
         self._session.headers.update({"User-Agent": "arxiv-client-py"})
 
     # TODO: Consider support for the following
-    #  1. Generator
-    #  2. Advanced paging
-    #  3. Consider async io
-    def search(self, query: Query) -> list[Article]:
+    #  1. Advanced paging
+    #  2. Async io
+    def search(self, query: Query) -> Iterator[Article]:
         """
         Search the Arxiv API
 
@@ -40,4 +40,5 @@ class Client:
 
         feed = feedparser.parse(response.content)
         logger.debug("ArXiv returned %d results", len(feed.entries))
-        return [Article.from_feed_entry(entry) for entry in feed.entries]
+        for entry in feed.entries:
+            yield Article.from_feed_entry(entry)

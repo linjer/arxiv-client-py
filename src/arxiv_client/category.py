@@ -8,6 +8,7 @@ class Category(Enum):
 
     See [Arxiv category taxonomy](https://arxiv.org/category_taxonomy)
     """
+
     @classmethod
     def __new__(cls, value: object, description: str | None = None) -> Self:
         """Allows for custom descriptions for each enum value"""
