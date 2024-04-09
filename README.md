@@ -7,11 +7,6 @@ This differs from the pre-existing [arxiv.py](https://github.com/lukasschwab/arx
 in that it further abstracts away the arXiv API so you do not need to learn to construct
 query strings. The overall goal is to enable users to skip reading the API docs entirely.
 
-`arxiv.py` is currently:
-
-- More stable
-- Compatible with Python < 3.11
-
 ## Basic Features
 
 - Simple structured queries
