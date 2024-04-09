@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 class Client:
     """
-    Python wrapper for the Arxiv API
+    Structured Python3 client for the Arxiv API
     """
 
     base_search_url = "https://export.arxiv.org/api/query"
@@ -92,18 +92,18 @@ class Client:
             try:
                 self._apply_paging_delay(chunk_delay_ms)
                 response = self._session.get(self.base_search_url, params=query._to_url_params())
-                response.raise_for_status()
                 self._last_request_dt = datetime.now()
+                response.raise_for_status()
 
                 feed = feedparser.parse(response.content)
-                logger.debug("Successfully retrieved chunk of %d articles", len(feed.entries))
+                logger.debug("Successfully retrieved page of %d articles", len(feed.entries))
                 return feed
             except (requests.HTTPError, requests.exceptions.ConnectionError, requests.exceptions.ConnectTimeout) as e:
-                logger.warning("Failed to retrieve chunk of articles: %s", e)
+                logger.warning("Failed to retrieve page of articles: %s", e)
                 try_count += 1
 
-        msg = f"Failed to retrieve chunk of articles after {chunk_max_retries} retries"
-        logger.error(msg, extra={"query": query})
+        msg = f"Failed to retrieve page of articles after {chunk_max_retries} retries"
+        logger.error(msg, extra={"page_query": query})
         raise RuntimeError(msg)
 
     def _apply_paging_delay(self, delay_ms: int) -> None:

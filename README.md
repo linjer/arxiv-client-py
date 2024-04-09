@@ -1,7 +1,7 @@
 # arxiv-client
 
 Python3 client for the [arXiv API](https://info.arxiv.org/help/api/user-manual.html).
-Install package [`arxiv_client`](https://pypi.org/project/arxiv-client/) PyPI.
+Install package [`arxiv_client`](https://pypi.org/project/arxiv-client/) from PyPI.
 
 This differs from the pre-existing [arxiv.py](https://github.com/lukasschwab/arxiv.py) project 
 in that it further abstracts away the arXiv API so you do not need to learn to construct
