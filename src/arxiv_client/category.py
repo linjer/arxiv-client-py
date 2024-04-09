@@ -9,12 +9,12 @@ class Category(Enum):
     See [Arxiv category taxonomy](https://arxiv.org/category_taxonomy)
     """
 
-    @classmethod
-    def __new__(cls, value: object, description: str | None = None) -> Self:
+    def __new__(cls, value: str, description: str | None = None) -> Self:  # noqa
         """Allows for custom descriptions for each enum value"""
         obj = object.__new__(cls)
         obj._value_ = value
-        obj.__doc__ = description
+        if description is not None:
+            obj.__doc__ = description
         return obj
 
     # Computer Science

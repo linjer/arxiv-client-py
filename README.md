@@ -1,7 +1,7 @@
 # arxiv-client
 
 Python3 client for the [arXiv API](https://info.arxiv.org/help/api/user-manual.html).
-Install package from [PyPI](https://pypi.org/project/arxiv-client/): `arxiv_client`.
+Install package [`arxiv_client`](https://pypi.org/project/arxiv-client/) PyPI.
 
 This differs from the pre-existing [arxiv.py](https://github.com/lukasschwab/arxiv.py) project 
 in that it further abstracts away the arXiv API so you do not need to learn to construct
@@ -11,20 +11,13 @@ query strings. The overall goal is to enable users to skip reading the API docs 
 
 - More stable
 - Compatible with Python < 3.11
-- Performant for large queries
 
 ## Basic Features
 
-- Simple query building
+- Simple structured queries
 - Comprehensive entity models, with documentation
   - For example, see the [Category](src/arxiv_client/category.py) enum for arXiv's subject taxonomy
 - Fully type annotated
-
-### Under Development
-
-- Improved page chunking for large queries
-- Support for querying more fields
-- Testing and validation
 
 ## Usage
 
@@ -46,6 +39,17 @@ for article in articles:
 When using the structured `Query` fields, multiple values within a single field are combined using `OR`, 
 and multiple fields are combined using `AND`.
 
+#### Searchable Fields
+
+The `Query` object accepts the following field filters:
+
+- `keywords`: terms across all fields
+- `title_keywords`: terms in the article title
+- `author_names`: names in the author list
+- `categories`: arXiv subject categories
+- `article_ids`: arXiv article IDs
+- `custom_params`: custom query string
+
 #### Example
 
 ```py
@@ -65,7 +69,7 @@ Query(keywords=["llm"], categories=[Category.CS_AI, Category.CS_IR], max_results
 Results in the following query logic:
 
 ```
-(all:"llm") AND (cat:cs.AI OR cat:cs.IR)
+("llm") in any field AND (cs.AI OR cs.IR) in the categories
 ```
 
 See the [Query](src/arxiv_client/query.py) class for more information.
@@ -94,6 +98,12 @@ Query(keywords=["paged attention", "attention window"], custom_params=custom)
 ```
 
 Results in the following query logic:
+
+```
+("paged attention" OR "attention window") in any field AND (cs.AI AND NOT cs.RO) in the categories
+```
+
+Equivalent query string:
 
 ```
 (all:"paged attention" OR all:"attention window") AND (cat:cs.AI ANDNOT cat:cs.RO)
