@@ -66,15 +66,15 @@ class Client:
             total_results = int(feed.feed.opensearch_totalresults)
 
             logger.debug("Retrieved %d of %d total articles", total_retrieved, total_results)
-            if not feed.entries:
-                return
-
             for entry in feed.entries:
                 yield Article.from_feed_entry(entry)
 
-            subquery.max_results = min(query.max_results - total_retrieved, page_size)
+            if not feed.entries or total_retrieved >= total_results:
+                return
+
             if page_size is not None:
                 subquery.start += page_size
+                subquery.max_results = min(query.max_results - total_retrieved, page_size)
 
     def _get_sub_page(self, query: Query, chunk_delay_ms, chunk_max_retries: int) -> feedparser.FeedParserDict:
         """
