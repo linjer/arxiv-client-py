@@ -84,11 +84,6 @@ class Query:
     [Arxiv Query Construction](https://info.arxiv.org/help/api/user-manual.html#query_details)
     """
 
-    # TODO: Support for remaining searchable fields
-    #   - abstract
-    #   - comment
-    #   - journal reference
-    #   - report number
     keywords: list[str]
     """
     Keywords to search across all fields.
@@ -104,6 +99,14 @@ class Query:
     categories: list[Category]
     """
     Subject categories to filter on.
+    """
+    abstract_keywords: list[str]
+    """
+    Keywords to search for in the article's abstract
+    """
+    comment_keywords: list[str]
+    """
+    Keywords to search for in the author's comment
     """
     article_ids: list[str]
     """
@@ -134,6 +137,8 @@ class Query:
         title_keywords: list[str] | None = None,
         author_names: list[str] | None = None,
         categories: list[Category] | None = None,
+        abstract_keywords: list[str] | None = None,
+        comment_keywords: list[str] | None = None,
         article_ids: list[str] | None = None,
         custom_params: str | None = None,
         sort_criterion: SortCriterion | None = None,
@@ -145,6 +150,8 @@ class Query:
         :param title_keywords: Title keywords to filter on
         :param author_names: Author names to filter on
         :param categories: Categories to filter on
+        :param abstract_keywords: Keywords to search for in the article's abstract
+        :param comment_keywords: Keywords to search for in the author's comment
         :param article_ids: ArXiv article IDs to filter on. If you want to retrieve a specific version, simply append
             `v{version#}` to the article ID, e.g., `2103.12345v1` for version 1 of article `2103.12345`
         :param custom_params: Raw query string for advanced users
@@ -155,6 +162,8 @@ class Query:
         self.title_keywords = [] if title_keywords is None else title_keywords
         self.author_names = [] if author_names is None else author_names
         self.categories = [] if categories is None else categories
+        self.abstract_keywords = [] if abstract_keywords is None else abstract_keywords
+        self.comment_keywords = [] if comment_keywords is None else comment_keywords
         self.article_ids = [] if article_ids is None else article_ids
         self.custom_params = custom_params
         self.sort_criterion = SortCriterion() if sort_criterion is None else sort_criterion
@@ -187,6 +196,16 @@ class Query:
             if self.categories
             else ""
         )
+        abs_keywords = (
+            " OR ".join(f'{Field.ABSTRACT.value}:"{keyword}"' for keyword in self.abstract_keywords)
+            if self.abstract_keywords
+            else ""
+        )
+        comment_keywords = (
+            " OR ".join(f'{Field.COMMENT.value}:"{keyword}"' for keyword in self.comment_keywords)
+            if self.comment_keywords
+            else ""
+        )
 
         partials: list[str] = []
         if keywords:
@@ -197,6 +216,10 @@ class Query:
             partials.append(f"({authors})")
         if categories:
             partials.append(f"({categories})")
+        if abs_keywords:
+            partials.append(f"({abs_keywords})")
+        if comment_keywords:
+            partials.append(f"({comment_keywords})")
         if self.custom_params:
             partials.append(f"({self.custom_params})")
 

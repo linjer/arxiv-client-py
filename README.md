@@ -42,6 +42,8 @@ The `Query` object accepts the following field filters:
 - `title_keywords`: terms in the article title
 - `author_names`: names in the author list
 - `categories`: arXiv subject categories
+- `abstract_keywords`: terms in the article abstract
+- `comment_keywords`: terms in the author provided comment
 - `article_ids`: arXiv article IDs
 - `custom_params`: custom query string
 
