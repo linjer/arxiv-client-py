@@ -2,7 +2,7 @@ import copy
 import logging
 import time
 from collections.abc import Iterator
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 
 import feedparser  # type: ignore
 import requests
@@ -60,7 +60,7 @@ class Client:
             subquery.max_results = page_size
 
         total_retrieved = 0
-        while total_retrieved < query.max_results:
+        while total_retrieved < (query.max_results or float("inf")):
             feed = self._get_sub_page(subquery, paging_delay_ms, paging_max_retries)
             total_retrieved += len(feed.entries)
             total_results = int(feed.feed.opensearch_totalresults)
@@ -74,35 +74,36 @@ class Client:
 
             if page_size is not None:
                 subquery.start += page_size
-                subquery.max_results = min(query.max_results - total_retrieved, page_size)
+                if query.max_results is not None:
+                    subquery.max_results = min(query.max_results - total_retrieved, page_size)
 
-    def _get_sub_page(self, query: Query, chunk_delay_ms, chunk_max_retries: int) -> feedparser.FeedParserDict:
+    def _get_sub_page(self, query: Query, paging_delay_ms: int, paging_max_retries: int) -> feedparser.FeedParserDict:
         """
         Get a chunk of search results from the Arxiv API.
 
         Will raise a RuntimeError if the chunk request fails after `chunk_max_retries` attempts.
 
         :param query: The query to search with
-        :param chunk_delay_ms: The delay in milliseconds between each chunk request
-        :param chunk_max_retries: The max number of retries for each chunk request
+        :param paging_delay_ms: The delay in milliseconds between each chunk request
+        :param paging_max_retries: The max number of retries for each chunk request
         :return: The search results
         """
         try_count = 0
-        while try_count <= chunk_max_retries:
+        while try_count <= paging_max_retries:
             try:
-                self._apply_paging_delay(chunk_delay_ms)
-                response = self._session.get(self.base_search_url, params=query._to_url_params())
-                self._last_request_dt = datetime.now()
+                self._apply_paging_delay(paging_delay_ms)
+                response = self._session.get(self.base_search_url, params=query._to_url_params())  # noqa SLF001
+                self._last_request_dt = datetime.now(tz=UTC)
                 response.raise_for_status()
-
                 feed = feedparser.parse(response.content)
-                logger.debug("Successfully retrieved page of %d articles", len(feed.entries))
-                return feed
             except (requests.HTTPError, requests.exceptions.ConnectionError, requests.exceptions.ConnectTimeout) as e:
                 logger.warning("Failed to retrieve page of articles: %s", e)
                 try_count += 1
+            else:
+                logger.debug("Successfully retrieved page of %d articles", len(feed.entries))
+                return feed
 
-        msg = f"Failed to retrieve page of articles after {chunk_max_retries} retries"
+        msg = f"Failed to retrieve page of articles after {paging_max_retries} retries"
         logger.error(msg, extra={"page_query": query})
         raise RuntimeError(msg)
 
@@ -115,7 +116,7 @@ class Client:
             return
 
         min_delay = timedelta(milliseconds=delay_ms)
-        elapsed = datetime.now() - self._last_request_dt
+        elapsed = datetime.now(tz=UTC) - self._last_request_dt
         if elapsed < min_delay:
             wait_time = (min_delay - elapsed).total_seconds()
             logger.debug("Waiting %s seconds before next request", wait_time)
