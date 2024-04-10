@@ -20,13 +20,13 @@ In a nutshell:
 
 ```py
 import arxiv_client as arx
-import pprint
+
 
 categories = [arx.Category.CS_AI, arx.Category.CS_CL, arx.Category.CS_IR]
 client = arx.Client()
-articles = client.search(arx.Query(keywords=["llm"], categories=categories, max_results=2))
+articles = client.search(arx.Query(keywords=["llm"], categories=categories, max_results=10))
 for article in articles:
-  pprint.pprint(article)  # Formatted pretty print is supported
+    print(article)
 ```
 
 ### Structured Query Logic
@@ -51,16 +51,19 @@ The `Query` object accepts the following field filters:
 
 ```py
 Query(keywords=["llm"], categories=[Category.CS_AI, Category.CS_IR], max_results=5)
-# Query(keywords=['llm'],
-#       title_keywords=[],
-#       author_names=[],
-#       categories=[<Category.CS_AI: 'cs.AI'>, <Category.CS_IR: 'cs.IR'>],
-#       article_ids=[],
-#       custom_params=None,
-#       sort_criterion=SortCriterion(sort_by=<SortBy.LAST_UPDATED_DATE: 'lastUpdatedDate'>,
-#                                    sort_order=<SortOrder.DESC: 'descending'>),
-#       start=None,
-#       max_results=5)
+# Query(
+#     keywords=['llm'],
+#     title_keywords=[],
+#     author_names=[],
+#     categories=[<Category.CS_AI: 'cs.AI'>, <Category.CS_IR: 'cs.IR'>],
+#     abstract_keywords=[],
+#     comment_keywords=[],
+#     article_ids=[],
+#     custom_params=None,
+#     sort_criterion=SortCriterion(sort_by=<SortBy.LAST_UPDATED_DATE: 'lastUpdatedDate'>, sort_order=<SortOrder.DESC: 'descending'>),
+#     start=0,
+#     max_results=5
+# )
 ```
 
 Results in the following query logic:
@@ -82,16 +85,19 @@ See [arXiv Query Construction](https://info.arxiv.org/help/api/user-manual.html#
 ```py
 custom = f"cat:{Category.CS_AI.value} ANDNOT cat:{Category.CS_RO.value}"
 Query(keywords=["paged attention", "attention window"], custom_params=custom)
-# Query(keywords=['paged attention', 'attention window'],
-#       title_keywords=[],
-#       author_names=[],
-#       categories=[],
-#       article_ids=[],
-#       custom_params='cat:cs.AI ANDNOT cat:cs.RO',
-#       sort_criterion=SortCriterion(sort_by=<SortBy.LAST_UPDATED_DATE: 'lastUpdatedDate'>,
-#                                    sort_order=<SortOrder.DESC: 'descending'>),
-#       start=None,
-#       max_results=10)
+# Query(
+#     keywords=['paged attention', 'attention window'],
+#     title_keywords=[],
+#     author_names=[],
+#     categories=[],
+#     abstract_keywords=[],
+#     comment_keywords=[],
+#     article_ids=[],
+#     custom_params='cat:cs.AI ANDNOT cat:cs.RO',
+#     sort_criterion=SortCriterion(sort_by=<SortBy.LAST_UPDATED_DATE: 'lastUpdatedDate'>, sort_order=<SortOrder.DESC: 'descending'>),
+#     start=0,
+#     max_results=10
+# )
 ```
 
 Results in the following query logic:

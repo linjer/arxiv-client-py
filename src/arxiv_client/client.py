@@ -56,7 +56,7 @@ class Client:
         """
         logger.debug("Searching arXiv with query: %r", query)
         subquery = copy.deepcopy(query)
-        if page_size is not None:
+        if page_size is not None and page_size < query.max_results:
             subquery.max_results = page_size
 
         total_retrieved = 0
