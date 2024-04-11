@@ -73,7 +73,7 @@ class Client:
                 return
 
             if page_size is not None:
-                subquery.start += page_size
+                subquery.start += len(feed.entries)
                 if query.max_results is not None:
                     subquery.max_results = min(query.max_results - total_retrieved, page_size)
 
@@ -92,10 +92,10 @@ class Client:
         while try_count <= paging_max_retries:
             try:
                 self._apply_paging_delay(paging_delay_ms)
-                response = self._session.get(self.base_search_url, params=query._to_url_params())  # noqa SLF001
-                self._last_request_dt = datetime.now(tz=UTC)
-                response.raise_for_status()
-                feed = feedparser.parse(response.content)
+                with self._session.get(self.base_search_url, params=query._to_url_params(), stream=False) as r: # noqa SLF001
+                    self._last_request_dt = datetime.now(tz=UTC)
+                    r.raise_for_status()
+                    feed = feedparser.parse(r.content)
             except (requests.HTTPError, requests.exceptions.ConnectionError, requests.exceptions.ConnectTimeout) as e:
                 logger.warning("Failed to retrieve page of articles: %s", e)
                 try_count += 1
