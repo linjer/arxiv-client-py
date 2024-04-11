@@ -31,6 +31,7 @@ class Category(Enum):
     CS_DC = "cs.DC", "Computer Science - Distributed; Parallel; and Cluster Computing"
     CS_DL = "cs.DL", "Computer Science - Digital Libraries"
     CS_DM = "cs.DM", "Computer Science - Discrete Mathematics"
+    CS_DS = "cs.DS", "Computer Science - Data Structures and Algorithms"
     CS_ET = "cs.ET", "Computer Science - Emerging Technologies"
     CS_FL = "cs.FL", "Computer Science - Formal Languages and Automata Theory"
     CS_GL = "cs.GL", "Computer Science - General Literature"

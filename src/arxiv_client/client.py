@@ -35,7 +35,7 @@ class Client:
         self,
         query: Query,
         page_size: int | None = None,
-        paging_delay_ms: int = 500,
+        paging_delay_ms: int = 250,
         paging_max_retries: int = 1,
     ) -> Iterator[Article]:
         """
