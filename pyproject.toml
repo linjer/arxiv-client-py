@@ -32,6 +32,7 @@ dependencies = [
   "coverage[toml]>=6.5",
   "mypy",
   "pytest",
+  "rich",
 ]
 
 [tool.hatch.envs.default.scripts]

@@ -11,12 +11,22 @@ query strings. The overall goal is to enable users to skip reading the API docs 
 
 - Simple structured queries
 - Comprehensive entity models, with documentation
-  - For example, see the [Category](src/arxiv_client/category.py) enum for arXiv's subject taxonomy
+  - For example, see the [Category](src/arxiv_client/category.py) enum for arXiv's category taxonomy
 - Fully type annotated
 
 ## Usage
 
-In a nutshell:
+### Daily RSS Feed
+
+```py
+import arxiv_client as arx
+
+
+client = arx.Client()
+articles = client.rss_by_subject(arx.Subject.COMPUTER_SCIENCE)
+```
+
+### Search
 
 ```py
 import arxiv_client as arx
@@ -29,7 +39,7 @@ for article in articles:
     print(article)
 ```
 
-### Structured Query Logic
+### Structured Search Query Logic
 
 When using the structured `Query` fields, multiple values within a single field are combined using `OR`, 
 and multiple fields are combined using `AND`.
@@ -74,7 +84,7 @@ Results in the following query logic:
 
 See the [Query](src/arxiv_client/query.py) class for more information.
 
-### Custom Queries
+### Custom Search Queries
 
 If the provided simple query logic is insufficient, the `Query` object takes a self-built query string through the `custom_params` attribute. You do not need to URL encode this value.
 
@@ -111,6 +121,24 @@ Equivalent query string:
 ```
 (all:"paged attention" OR all:"attention window") AND (cat:cs.AI ANDNOT cat:cs.RO)
 ```
+
+## Known Issues
+
+The arXiv search API is unreliable, especially for large queries.
+
+The API will sometimes return incomplete results or return no entries,
+although the response is valid. See this [GitHub issue](https://github.com/lukasschwab/arxiv.py/issues/43)
+for discussion on the topic.
+
+If you are encountering this problem, some things that may help include:
+
+- Reduce the page size; `100` seems to have a relatively high success rate
+- Increase paging retry and delay parameters
+- Break up large queries into smaller queries
+
+Retries often help with the issue, but are sometimes insufficient.
+If you need more reliable access to large query results, consider looking into
+the [arXiv Bulk Data Access](https://info.arxiv.org/help/bulk_data.html) options.
 
 ## Development
 

@@ -188,3 +188,21 @@ class Category(Enum):
     STAT_ML = "stat.ML", "Statistics - Machine Learning"
     STAT_OT = "stat.OT", "Statistics - Other Statistics"
     STAT_TH = "stat.TH", "Statistics - Statistics Theory"
+
+
+class Subject(Enum):
+    """
+    This is what some parts of the arXiv documentation calls category, referring to the above as
+    subject class.
+    """
+    COMPUTER_SCIENCE = "cs"
+    ECONOMICS = "econ"
+    ELECTRICAL_ENGINEERING_AND_SYSTEMS_SCIENCE = "eess"
+    MATHEMATICS = "math"
+    ASTROPHYSICS = "astro-ph"
+    CONDENSED_MATTER = "cond-mat"
+    NONLINEAR_SCIENCES = "nlin"
+    PHYSICS = "physics"
+    QUANTITATIVE_BIOLOGY = "q-bio"
+    QUANTITATIVE_FINANCE = "q-fin"
+    STATISTICS = "stat"

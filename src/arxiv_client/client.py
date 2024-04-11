@@ -7,7 +7,7 @@ from datetime import UTC, datetime, timedelta
 import feedparser  # type: ignore
 import requests
 
-from arxiv_client import Article, Query
+from arxiv_client import Article, Query, __about__, Subject, Category
 
 logger = logging.getLogger(__name__)
 
@@ -21,22 +21,50 @@ class Client:
     """
     Base URL for Arxiv API
     """
+    base_rss_url = "https://rss.arxiv.org/rss"
+    """
+    Base URL for arXiv RSS feeds
+    """
 
     _session: requests.Session
     _last_request_dt: datetime | None
 
     def __init__(self) -> None:
         self._session = requests.Session()
-        self._session.headers.update({"User-Agent": "arxiv-client-py"})
+        self._session.headers.update({"User-Agent": f"arxiv-client-py/{__about__.__version__}"})
         self._last_request_dt = None
 
-    # TODO: Consider async io
+    def rss_by_subject(self, subject: Subject) -> Iterator[Article]:
+        """
+        Get articles from the arXiv daily RSS feed. Only broad subjects are supported.
+        Use `rss_by_category` for more specific category.
+
+        Pages are updated daily at midnight EST.
+        More info: https://info.arxiv.org/help/rss.html
+        """
+        url = f"{self.base_rss_url}/{subject.value}"
+        feed = self._get_parsed_rss(url)
+        for entry in feed.entries:
+            yield Article.from_feed_entry(entry)
+
+    def rss_by_category(self, categories: list[Category]) -> Iterator[Article]:
+        """
+        Get articles from the arXiv daily RSS feed. Pages are updated daily at midnight EST
+
+        More info: https://info.arxiv.org/help/rss.html
+        """
+        cats = "+".join(cat.value for cat in categories)
+        url = f"{self.base_rss_url}/{cats}"
+        feed = self._get_parsed_rss(url)
+        for entry in feed.entries:
+            yield Article.from_feed_entry(entry)
+
     def search(
         self,
         query: Query,
         page_size: int | None = None,
         paging_delay_ms: int = 250,
-        paging_max_retries: int = 1,
+        paging_max_retries: int = 4,
     ) -> Iterator[Article]:
         """
         Search the Arxiv API.
@@ -79,9 +107,9 @@ class Client:
 
     def _get_sub_page(self, query: Query, paging_delay_ms: int, paging_max_retries: int) -> feedparser.FeedParserDict:
         """
-        Get a chunk of search results from the Arxiv API.
+        Get a page of search results from the Arxiv API.
 
-        Will raise a RuntimeError if the chunk request fails after `chunk_max_retries` attempts.
+        Will raise a RuntimeError if the page request fails after `page_max_retries` attempts.
 
         :param query: The query to search with
         :param paging_delay_ms: The delay in milliseconds between each chunk request
@@ -92,10 +120,19 @@ class Client:
         while try_count <= paging_max_retries:
             try:
                 self._apply_paging_delay(paging_delay_ms)
-                with self._session.get(self.base_search_url, params=query._to_url_params(), stream=False) as r: # noqa SLF001
+                with self._session.get(self.base_search_url, params=query._to_url_params(), stream=True) as r:  # noqa SLF001
                     self._last_request_dt = datetime.now(tz=UTC)
                     r.raise_for_status()
                     feed = feedparser.parse(r.content)
+                    logger.debug("Response headers: %r", r.headers)
+                    if Client._should_retry_search_page(feed):
+                        try_count += 1
+                        if try_count <= paging_max_retries:
+                            logger.debug("Incomplete response, retrying request")
+                        continue
+                    if feed.bozo:
+                        logger.warning("Feed parser encountered a bozo error: %s", feed.bozo_exception)
+
             except (requests.HTTPError, requests.exceptions.ConnectionError, requests.exceptions.ConnectTimeout) as e:
                 logger.warning("Failed to retrieve page of articles: %s", e)
                 try_count += 1
@@ -121,3 +158,38 @@ class Client:
             wait_time = (min_delay - elapsed).total_seconds()
             logger.debug("Waiting %s seconds before next request", wait_time)
             time.sleep(wait_time)
+
+    def _get_parsed_rss(self, url: str) -> feedparser.FeedParserDict:
+        """
+        Get and parse an RSS feed from arXiv
+        """
+        r = self._session.get(url)
+        r.raise_for_status()
+        feed = feedparser.parse(r.content)
+        logger.debug("Retrieved RSS feed '%s' containing %d articles", feed.feed.title, len(feed.entries))
+        return feed
+
+    @staticmethod
+    def _should_retry_search_page(feed: feedparser.FeedParserDict) -> bool:
+        """
+        Determine if a request should be retried based on response content.
+
+        Sometimes arXiv will return a valid response with no content. This issue has been
+        discussed here (https://github.com/lukasschwab/arxiv.py/issues/43) and it is
+        believed to be an issue on the arXiv side that is sometimes resolved through
+        retries.
+
+        Separately, arXiv sometimes returns fewer entries than available.
+        It's currently believed that a retry is not necessary and advancing
+        the cursor should yield correct results, but this is not confirmed.
+
+        :param feed: The feed parsed from the response
+        :return: True if the request should be retried, False otherwise
+        """
+        num_available = int(feed.feed.opensearch_totalresults) - int(feed.feed.opensearch_startindex)
+        if not feed.entries and num_available > 0:
+            msg = "Feed unexpectedly has no entries, even though there are %d articles available"
+            logger.warning(msg, num_available)
+            return True
+
+        return False
