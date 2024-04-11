@@ -21,14 +21,14 @@ class Client:
     """
     Base URL for Arxiv API
     """
-    base_rss_url = "https://rss.arxiv.org/rss"
+    base_rss_atom_url = "https://rss.arxiv.org"
     """
     Base URL for arXiv RSS feeds
     """
 
     _session: requests.Session
     _last_request_dt: datetime | None
-    _max_rss_entries = 2_000
+    _max_rss_atom_entries = 2_000
     """
     Feeds appear to be capped at 2000 entries.
     See https://info.arxiv.org/help/rss.html
@@ -39,6 +39,33 @@ class Client:
         self._session.headers.update({"User-Agent": f"arxiv-client-py/{__about__.__version__}"})
         self._last_request_dt = None
 
+    def atom_by_subject(self, subject: Subject) -> Iterator[Article]:
+        """
+        Get articles from the arXiv daily Atom feed. Only broad subjects are supported.
+        This feed includes the `Article.updated` field, which is not included in the RSS feed.
+
+        Pages are updated daily at midnight EST.
+        More info: https://info.arxiv.org/help/rss.html
+        """
+        url = f"{self.base_rss_atom_url}/atom/{subject.value}"
+        feed = self._get_parsed_rss(url)
+        for entry in feed.entries:
+            yield Article.from_rss_atom_entry(entry)
+
+    def atom_by_category(self, categories: list[Category]) -> Iterator[Article]:
+        """
+        Get articles from the arXiv daily Atom feed. This feed includes the `Article.updated` field,
+        which is not included in the RSS feed.
+
+        Pages are updated daily at midnight EST.
+        More info: https://info.arxiv.org/help/rss.html
+        """
+        cats = "+".join(cat.value for cat in categories)
+        url = f"{self.base_rss_atom_url}/{cats}"
+        feed = self._get_parsed_rss(url)
+        for entry in feed.entries:
+            yield Article.from_rss_atom_entry(entry)
+
     def rss_by_subject(self, subject: Subject) -> Iterator[Article]:
         """
         Get articles from the arXiv daily RSS feed. Only broad subjects are supported.
@@ -47,10 +74,10 @@ class Client:
         Pages are updated daily at midnight EST.
         More info: https://info.arxiv.org/help/rss.html
         """
-        url = f"{self.base_rss_url}/{subject.value}"
+        url = f"{self.base_rss_atom_url}/rss/{subject.value}"
         feed = self._get_parsed_rss(url)
         for entry in feed.entries:
-            yield Article.from_feed_entry(entry)
+            yield Article.from_rss_atom_entry(entry)
 
     def rss_by_category(self, categories: list[Category]) -> Iterator[Article]:
         """
@@ -59,10 +86,10 @@ class Client:
         More info: https://info.arxiv.org/help/rss.html
         """
         cats = "+".join(cat.value for cat in categories)
-        url = f"{self.base_rss_url}/{cats}"
+        url = f"{self.base_rss_atom_url}/{cats}"
         feed = self._get_parsed_rss(url)
         for entry in feed.entries:
-            yield Article.from_feed_entry(entry)
+            yield Article.from_rss_atom_entry(entry)
 
     def search(
         self,
@@ -100,7 +127,7 @@ class Client:
 
             logger.debug("Retrieved %d of %d total articles", total_retrieved, total_results)
             for entry in feed.entries:
-                yield Article.from_feed_entry(entry)
+                yield Article.from_search_entry(entry)
 
             if not feed.entries or total_retrieved >= total_results:
                 return
@@ -171,10 +198,10 @@ class Client:
         r = self._session.get(url)
         r.raise_for_status()
         feed = feedparser.parse(r.content)
-        logger.debug("Retrieved RSS feed '%s' containing %d articles", feed.feed.title, len(feed.entries))
-        if len(feed.entries) == self._max_rss_entries:
-            msg = "RSS feed contains maximum number of entries (%d) and may be omitting data"
-            logger.warning(msg, self._max_rss_entries)
+        logger.debug("Retrieved RSS/Atom feed '%s' containing %d articles", feed.feed.title, len(feed.entries))
+        if len(feed.entries) >= self._max_rss_atom_entries:
+            msg = "ArXiv RSS/Atom feed exceeds maximum number of entries (%d) and may be omitting data"
+            logger.warning(msg, self._max_rss_atom_entries)
 
         return feed
 
