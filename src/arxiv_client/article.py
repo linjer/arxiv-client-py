@@ -68,7 +68,7 @@ class Article:
     The raw feedparser entry for the article, helpful for debugging
     """
 
-    _id_prefix = "http://arxiv.org/abs/"
+    _id_prefix_len = len("http://arxiv.org/abs/")
 
     def __init__(
         self,
@@ -155,8 +155,8 @@ class Article:
         # The arXiv ID is provided correctly in RSS feeds
         # https://info.arxiv.org/help/api/user-manual.html#3321-title-id-published-and-updated
         arxiv_id = entry.id
-        if arxiv_id.startswith(Article._id_prefix):
-            arxiv_id = arxiv_id[len(Article._id_prefix) :]
+        if arxiv_id.startswith("http"):
+            arxiv_id = arxiv_id[Article._id_prefix_len :]
         title = entry.title if hasattr(entry, "title") else "0"
         primary_cat = entry.get("arxiv_primary_category", {}).get("term")
         return cls(

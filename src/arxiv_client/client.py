@@ -28,6 +28,11 @@ class Client:
 
     _session: requests.Session
     _last_request_dt: datetime | None
+    _max_rss_entries = 2_000
+    """
+    Feeds appear to be capped at 2000 entries.
+    See https://info.arxiv.org/help/rss.html
+    """
 
     def __init__(self) -> None:
         self._session = requests.Session()
@@ -167,6 +172,10 @@ class Client:
         r.raise_for_status()
         feed = feedparser.parse(r.content)
         logger.debug("Retrieved RSS feed '%s' containing %d articles", feed.feed.title, len(feed.entries))
+        if len(feed.entries) == self._max_rss_entries:
+            msg = "RSS feed contains maximum number of entries (%d) and may be omitting data"
+            logger.warning(msg, self._max_rss_entries)
+
         return feed
 
     @staticmethod
