@@ -148,8 +148,6 @@ class Article:
         arxiv_id = id_matcher.group(1)
         version = id_matcher.group(2) or 1
         desc_matcher = Article._rss_atom_desc_re.match(entry.description)
-        if not desc_matcher:
-            logger.error("WTF happened: %r", entry.description)
         abstract = desc_matcher.group(2)
         return cls(
             arxiv_id=arxiv_id,

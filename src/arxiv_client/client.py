@@ -156,7 +156,6 @@ class Client:
                     self._last_request_dt = datetime.now(tz=UTC)
                     r.raise_for_status()
                     feed = feedparser.parse(r.content)
-                    logger.debug("Response headers: %r", r.headers)
                     if Client._should_retry_search_page(feed):
                         try_count += 1
                         if try_count <= paging_max_retries:
