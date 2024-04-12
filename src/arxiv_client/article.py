@@ -72,6 +72,7 @@ class Article:
     The raw feedparser entry for the article, helpful for debugging or accessing additional information
     """
 
+    _pdf_base_url = "https://arxiv.org/pdf"
     _versioned_id_re = re.compile(r"([^vV]+)[vV]?(\d*)")
     _id_search_prefix_len = len("http://arxiv.org/abs/")
     _rss_atom_desc_re = re.compile(r"^[^:]*:(\S*)\s+.*Abstract: (.*)$", re.DOTALL)
@@ -118,26 +119,12 @@ class Article:
     @cached_property
     def pdf_url(self) -> str | None:
         """
-        Get the URL to the PDF of the article. A PDF link should always be present
+        Get the URL to the PDF of the article.
+        This assumes a PDF is properly hosted on arXiv
 
         :return: The URL to the PDF
         """
-        for link in self.links:
-            if link.title == "pdf":
-                return link.href
-        return None
-
-    @cached_property
-    def doi_url(self) -> str | None:
-        """
-        Get the DOI URL for the article if it exists. May not be needed as the doi field may already contain the URL
-
-        :return: The URL to the resolved DOI
-        """
-        for link in self.links:
-            if link.title == "doi":
-                return link.href
-        return None
+        return f"{self._pdf_base_url}/{self.arxiv_id}"
 
     @property
     def raw_entry(self) -> feedparser.FeedParserDict:
